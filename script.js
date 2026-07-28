@@ -1,4 +1,14 @@
-const state={stars:Number(localStorage.getItem("alice-stars")||0),currentSyllable:"MA",target:34,selectedTen:null,selectedUnit:null};
+let voices = [];
+
+function loadVoices() {
+    voices = speechSynthesis.getVoices();
+}
+
+loadVoices();
+
+if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = loadVoices;
+}const state={stars:Number(localStorage.getItem("alice-stars")||0),currentSyllable:"MA",target:34,selectedTen:null,selectedUnit:null};
 const syllables=["MA","ME","MI","MO","MU","LA","LE","LI","LO","LU","SA","SE","SI","SO","SU"];
 const el={stars:document.querySelector("#stars"),garden:document.querySelector("#garden"),readingPrompt:document.querySelector("#readingPrompt"),readingChoices:document.querySelector("#readingChoices"),readingMessage:document.querySelector("#readingMessage"),targetNumber:document.querySelector("#targetNumber"),tens:document.querySelector("#tens"),units:document.querySelector("#units"),assembled:document.querySelector("#assembled"),numberMessage:document.querySelector("#numberMessage")};
 function speak(text){if(!("speechSynthesis" in window)){alert("La voix n'est pas disponible dans ce navigateur.");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="fr-FR";u.rate=.88;u.pitch=1.35;speechSynthesis.speak(u)}
