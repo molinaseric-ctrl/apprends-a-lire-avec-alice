@@ -1,27 +1,73 @@
-let voices = [];
 
-function loadVoices() {
-    voices = speechSynthesis.getVoices();
+const missions=[
+ {icon:"🌲",realm:"Forêt des voyelles",title:"La lettre A",target:"A",items:["A","M","O","A","L","E","A","S","I","A","U","N"],story:"Plume : Retrouve tous les A cachés dans la forêt.",speech:"Trouve toutes les lettres A. Appuie sur chaque A, puis sur vérifier ma réponse."},
+ {icon:"🐞",realm:"Jardin de Lili",title:"La lettre L",target:"L",items:["L","M","A","L","S","O","L","I","R","L","E","L"],story:"Lili la coccinelle a perdu ses lettres L.",speech:"Trouve toutes les lettres L."},
+ {icon:"🐱",realm:"Maison de Chacha",title:"Le son CH",target:"CH",items:["CH","M","OU","CH","L","A","CH","S","ON","CH","OI","CH"],story:"Chacha cherche le son CH pour retrouver son chapeau.",speech:"Trouve tous les sons CH. Ch, comme dans chat."},
+ {icon:"🐻",realm:"Grotte d’Oscar",title:"Le son OU",target:"OU",items:["OU","ON","A","OU","CH","L","OU","M","OI","OU","S","OU"],story:"Oscar a besoin du son OU pour ouvrir son pot de miel.",speech:"Trouve tous les sons OU. Ou, comme dans ours."},
+ {icon:"🐑",realm:"Prairie magique",title:"Le son ON",target:"ON",items:["ON","OU","M","ON","A","CH","ON","L","OI","ON","R","ON"],story:"Le petit mouton cherche les sons ON dans la prairie.",speech:"Trouve tous les sons ON. On, comme dans mouton."},
+ {icon:"🦊",realm:"Forêt de Rouxy",title:"Le son OI",target:"OI",items:["OI","ON","A","OI","OU","L","OI","M","CH","OI","S","OI"],story:"Rouxy cherche les sons OI pour ouvrir la boîte magique.",speech:"Trouve tous les sons OI. Oi, comme dans roi."}
+];
+const KEY="alice-final-progress";
+let completed=new Set(JSON.parse(localStorage.getItem(KEY)||"[]"));
+let current=0, selected=new Set(), voices=[];
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+
+function save(){localStorage.setItem(KEY,JSON.stringify([...completed]))}
+function stars(){return completed.size*3}
+function updateStars(){$$("[data-stars]").forEach(e=>e.textContent=stars())}
+function show(id){$$(".screen").forEach(s=>s.classList.toggle("active",s.id===id));if(id==="map")renderMap();updateStars();scrollTo({top:0,behavior:"smooth"})}
+
+function loadVoices(){if("speechSynthesis" in window)voices=speechSynthesis.getVoices()}
+loadVoices(); if("speechSynthesis" in window)speechSynthesis.onvoiceschanged=loadVoices;
+function speak(text){
+ if(!("speechSynthesis" in window)){alert("La voix n’est pas disponible dans ce navigateur.");return}
+ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);
+ u.lang="fr-FR";u.rate=.82;u.pitch=1.08;u.volume=1;
+ const names=["Audrey","Amélie","Amelie","Marie","Virginie","Julie","Céline","Celine"];
+ let v=null; for(const name of names){v=voices.find(x=>x.lang?.toLowerCase().startsWith("fr")&&x.name.toLowerCase().includes(name.toLowerCase()));if(v)break}
+ v=v||voices.find(x=>x.lang?.toLowerCase()==="fr-fr")||voices.find(x=>x.lang?.toLowerCase().startsWith("fr")); if(v)u.voice=v;
+ speechSynthesis.speak(u)
 }
 
-loadVoices();
-
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = loadVoices;
-}const state={stars:Number(localStorage.getItem("alice-stars")||0),currentSyllable:"MA",target:34,selectedTen:null,selectedUnit:null};
-const syllables=["MA","ME","MI","MO","MU","LA","LE","LI","LO","LU","SA","SE","SI","SO","SU"];
-const el={stars:document.querySelector("#stars"),garden:document.querySelector("#garden"),readingPrompt:document.querySelector("#readingPrompt"),readingChoices:document.querySelector("#readingChoices"),readingMessage:document.querySelector("#readingMessage"),targetNumber:document.querySelector("#targetNumber"),tens:document.querySelector("#tens"),units:document.querySelector("#units"),assembled:document.querySelector("#assembled"),numberMessage:document.querySelector("#numberMessage")};
-function speak(text){if(!("speechSynthesis" in window)){alert("La voix n'est pas disponible dans ce navigateur.");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="fr-FR";u.rate=.88;u.pitch=1.35;speechSynthesis.speak(u)}
-function numberToFrench(n){const o=["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize"];if(n<17)return o[n];if(n<20)return"dix-"+o[n-10];const t={20:"vingt",30:"trente",40:"quarante",50:"cinquante",60:"soixante"};if(n<70){const d=Math.floor(n/10)*10,u=n%10;if(u===0)return t[d];if(u===1)return t[d]+" et un";return t[d]+"-"+o[u]}if(n<80){if(n===71)return"soixante et onze";return"soixante-"+numberToFrench(n-60)}if(n===80)return"quatre-vingts";return"quatre-vingt-"+numberToFrench(n-80)}
-function updateProgress(){el.stars.textContent=state.stars;const r=["🌱","🌷","🌳","🦋","🏡","🌈"];el.garden.textContent=r.slice(0,Math.min(Math.floor(state.stars/3)+1,r.length)).join(" ");localStorage.setItem("alice-stars",String(state.stars))}
-function addStar(){state.stars++;updateProgress()}
-function openScreen(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.querySelector(`#${id}`).classList.add("active");if(id==="reading")newReadingRound();if(id==="numbers")newNumberRound()}
-function shuffled(items){return[...items].sort(()=>Math.random()-.5)}
-function newReadingRound(){state.currentSyllable=syllables[Math.floor(Math.random()*syllables.length)];el.readingPrompt.textContent="🔊";el.readingMessage.textContent="";const c=[state.currentSyllable];while(c.length<3){const x=syllables[Math.floor(Math.random()*syllables.length)];if(!c.includes(x))c.push(x)}el.readingChoices.innerHTML="";shuffled(c).forEach(x=>{const b=document.createElement("button");b.className="choice";b.textContent=x;b.addEventListener("click",()=>checkSyllable(x,b));el.readingChoices.appendChild(b)});setTimeout(()=>speak(state.currentSyllable),250)}
-function checkSyllable(choice,button){if(choice===state.currentSyllable){button.classList.add("correct");el.readingPrompt.textContent=state.currentSyllable;el.readingMessage.textContent="Bravo ! Une étoile pour toi ⭐";speak(`Bravo ! ${state.currentSyllable}`);addStar();setTimeout(newReadingRound,1400)}else{button.classList.add("wrong");el.readingMessage.textContent="Presque ! Écoute encore.";speak("Presque. Écoute encore.");setTimeout(()=>button.classList.remove("wrong"),700)}}
-function buildNumberButtons(){el.tens.innerHTML="";el.units.innerHTML="";for(let n=10;n<=90;n+=10){const b=document.createElement("button");b.className="number-button";b.textContent=n;b.addEventListener("click",()=>{state.selectedTen=n;markSelected(el.tens,b);updateAssembled()});el.tens.appendChild(b)}for(let n=1;n<=9;n++){const b=document.createElement("button");b.className="number-button";b.textContent=n;b.addEventListener("click",()=>{state.selectedUnit=n;markSelected(el.units,b);updateAssembled()});el.units.appendChild(b)}}
-function markSelected(container,button){container.querySelectorAll(".number-button").forEach(b=>b.classList.remove("selected"));button.classList.add("selected")}
-function clearNumber(){state.selectedTen=null;state.selectedUnit=null;el.assembled.textContent="—";el.numberMessage.textContent="";document.querySelectorAll(".number-button").forEach(b=>b.classList.remove("selected"))}
-function newNumberRound(){state.target=(Math.floor(Math.random()*9)+1)*10+(Math.floor(Math.random()*9)+1);el.targetNumber.textContent=state.target;clearNumber();setTimeout(()=>speak(`Construis le nombre ${numberToFrench(state.target)}`),250)}
-function updateAssembled(){const value=(state.selectedTen||0)+(state.selectedUnit||0);el.assembled.textContent=value||"—";if(state.selectedTen&&state.selectedUnit){if(value===state.target){el.numberMessage.textContent=`Bravo ! ${numberToFrench(state.target)} ⭐`;speak(`Bravo ! ${numberToFrench(state.target)}`);addStar();setTimeout(newNumberRound,1600)}else{el.numberMessage.textContent="Presque ! Essaie encore.";speak("Presque. Essaie encore.")}}}
-document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>openScreen(b.dataset.open)));document.querySelector("#helloBtn").addEventListener("click",()=>speak("Bonjour ! Je suis Alice. Bienvenue dans mon aventure !"));document.querySelector("#resetBtn").addEventListener("click",()=>{state.stars=0;localStorage.removeItem("alice-stars");updateProgress();speak("On recommence l'aventure !")});document.querySelector("#listenSyllableBtn").addEventListener("click",()=>speak(state.currentSyllable));document.querySelector("#listenNumberBtn").addEventListener("click",()=>speak(numberToFrench(state.target)));document.querySelector("#clearNumberBtn").addEventListener("click",clearNumber);buildNumberButtons();updateProgress();if("serviceWorker" in navigator&&location.protocol.startsWith("http")){navigator.serviceWorker.register("service-worker.js").catch(()=>{})}
+function renderMap(){
+ const box=$("#realms"); box.innerHTML="";
+ missions.forEach((m,i)=>{
+  const unlocked=i===0||completed.has(i-1), done=completed.has(i);
+  const b=document.createElement("button"); b.className="realm "+(done?"done":unlocked?"open":"locked"); b.disabled=!unlocked;
+  b.innerHTML=`<span class="realm-icon">${m.icon}</span><strong>${m.realm}</strong><small>${done?"✅ Mission réussie":unlocked?`Mission ${i+1} · ${m.title}`:"🔒 Termine la mission précédente"}</small>`;
+  if(unlocked)b.onclick=()=>openMission(i); box.appendChild(b);
+  if(i<missions.length-1){const p=document.createElement("div");p.className="path";p.textContent="••••";box.appendChild(p)}
+ });
+ const pct=Math.round(completed.size/missions.length*100);$("#progressFill").style.width=pct+"%";
+ $("#progressText").textContent=completed.size+(completed.size>1?" missions terminées":" mission terminée")
+}
+function openMission(i){
+ current=i;selected.clear();const m=missions[i];
+ $("#missionNumber").textContent=`Mission ${i+1}`;$("#missionTitle").textContent=m.title;$("#storyText").textContent=m.story;
+ $("#instruction").innerHTML=`Clique sur tous les <strong>${m.target}</strong>.`;$("#feedback").textContent="";$("#feedback").className="feedback";
+ const grid=$("#choices");grid.innerHTML="";
+ m.items.forEach((item,n)=>{const b=document.createElement("button");b.className="choice";b.textContent=item;b.setAttribute("aria-label",item);
+  b.onclick=()=>{selected.has(n)?selected.delete(n):selected.add(n);b.classList.toggle("selected");speak(item)};grid.appendChild(b)});
+ show("game");setTimeout(()=>speak(m.speech),350)
+}
+$("#checkBtn").onclick=()=>{
+ const m=missions[current],buttons=[...$("#choices").children], correct=m.items.map((x,i)=>x===m.target?i:-1).filter(i=>i>=0);
+ const all=correct.every(i=>selected.has(i)), noWrong=[...selected].every(i=>m.items[i]===m.target);
+ buttons.forEach((b,i)=>{if(m.items[i]===m.target&&selected.has(i))b.classList.add("correct");if(m.items[i]!==m.target&&selected.has(i))b.classList.add("wrong")});
+ if(all&&noWrong){
+  completed.add(current);save();updateStars();$("#feedback").textContent="Bravo ! Tout est juste !";$("#feedback").className="feedback good";
+  speak(`Bravo Alice ! Mission réussie. Flamme gagne trois étoiles.`);
+  $("#celebrationText").textContent=`Tu as réussi : ${m.title}.`;
+  setTimeout(()=>show("celebration"),850)
+ }else{
+  $("#feedback").textContent=`Regarde encore bien… Il reste peut-être un ${m.target}.`;$("#feedback").className="feedback bad";
+  speak(`Regarde encore bien. Il reste peut-être un ${m.target}.`);setTimeout(()=>buttons.forEach(b=>b.classList.remove("wrong")),700)
+ }
+};
+$$("[data-go]").forEach(b=>b.onclick=()=>show(b.dataset.go));
+$("#startBtn").onclick=()=>{speak("Bienvenue Alice ! Choisis la forêt des voyelles pour commencer.");show("map")};
+$("#hearWelcome").onclick=()=>speak("Bonjour Alice ! Je suis Plume. Avec Flamme, nous allons retrouver les lettres magiques !");
+$("#hearInstruction").onclick=()=>speak(missions[current].speech);
+$("#resetBtn").onclick=()=>{if(confirm("Recommencer toute la progression ?")){completed.clear();save();renderMap();updateStars()}};
+updateStars();
+if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("service-worker.js").catch(()=>{});

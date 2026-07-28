@@ -1,106 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#8fd3c7" />
-  <meta name="description" content="Application éducative pour apprendre à lire et découvrir les nombres avec Alice." />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#6f47d8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Lire avec Alice">
   <title>Apprends à lire avec Alice</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="app-shell">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Jeu éducatif sans publicité</p>
-        <h1>Apprends à lire avec Alice</h1>
-      </div>
-      <div class="star-counter" aria-label="Nombre d'étoiles">⭐ <span id="stars">0</span></div>
-    </header>
+<main id="app">
 
-    <section id="home" class="screen active" aria-labelledby="home-title">
-      <div class="hero-card">
-        <div>
-          <span class="badge">Pour les enfants de 5 à 7 ans</span>
-          <h2 id="home-title">Bonjour, je suis Alice 👧</h2>
-          <p class="lead">Aujourd'hui, on joue avec les syllabes et les nombres.</p>
-          <div class="actions-grid">
-            <button class="primary yellow" data-open="reading">🔤 Les syllabes</button>
-            <button class="primary green" data-open="numbers">🔢 Les nombres</button>
-            <button class="primary purple" id="helloBtn">🔊 Écouter Alice</button>
-            <button class="primary blue" id="resetBtn">🔄 Recommencer</button>
-          </div>
-        </div>
-        <div class="alice-visual" aria-hidden="true">👧📖✨</div>
-      </div>
+<section class="screen active welcome" id="welcome">
+  <div class="world" aria-hidden="true">
+    <div class="sun"></div>
+    <div class="cloud c1">☁️</div><div class="cloud c2">☁️</div>
+    <div class="sparkles">✦　✧　·　✦　·　✧</div>
+    <div class="mountain"></div>
+    <div class="castle">🏰</div>
+    <div class="forest">🌲 🌳 🌲 🌳 🌲 🌳 🌲 🌳</div>
+    <div class="butterfly b1">🦋</div><div class="butterfly b2">🦋</div>
+    <div class="flying-dragon"><span>🐉</span><i>✨</i></div>
+  </div>
 
-      <div class="progress-card">
-        <div>
-          <strong>Mon aventure</strong>
-          <p>Chaque bonne réponse fait pousser le jardin d'Alice.</p>
-        </div>
-        <div id="garden" class="garden" aria-label="Jardin des récompenses">🌱</div>
-      </div>
-    </section>
+  <div class="hero-card">
+    <div class="brand">
+      <div class="owl">🦉</div>
+      <div><p class="overline">Le Royaume des Lettres</p><h1>Apprends à lire<br><em>avec Alice</em></h1></div>
+    </div>
+    <div class="bubble">Bonjour Alice ! Je suis Plume. Avec Flamme, nous allons retrouver les lettres magiques !</div>
+    <button class="primary huge" id="startBtn">✨ Commencer l’aventure</button>
+    <button class="secondary" id="hearWelcome">🔊 Écouter Plume</button>
+  </div>
+  <p class="footer-note">Une aventure magique pour apprendre à lire</p>
+</section>
 
-    <section id="reading" class="screen" aria-labelledby="reading-title">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">La forêt des syllabes</p>
-          <h2 id="reading-title">Écoute et choisis</h2>
-        </div>
-        <button class="icon-button" data-open="home" aria-label="Retour à l'accueil">🏠</button>
-      </div>
+<section class="screen page" id="map">
+  <header class="bar">
+    <button class="circle" data-go="welcome">←</button>
+    <div><p class="overline">Carte magique</p><h2>Les royaumes</h2></div>
+    <div class="counter">⭐ <span data-stars>0</span></div>
+  </header>
+  <div class="progress-wrap"><div class="progress"><div id="progressFill"></div></div><small id="progressText">0 mission terminée</small></div>
+  <div class="realms" id="realms"></div>
+  <div class="friends"><span>🦉</span><div class="bubble mini">Choisis le premier royaume disponible.</div><span class="flip">🐉</span></div>
+  <button class="secondary reset" id="resetBtn">↻ Recommencer la progression</button>
+</section>
 
-      <div class="game-card">
-        <div class="prompt-card">
-          <p>Quelle syllabe entends-tu ?</p>
-          <div id="readingPrompt" class="big-symbol">🔊</div>
-          <button id="listenSyllableBtn" class="secondary">Écouter encore</button>
-        </div>
-        <div id="readingChoices" class="choice-grid"></div>
-        <p id="readingMessage" class="feedback" aria-live="polite"></p>
-      </div>
-    </section>
+<section class="screen page" id="game">
+  <header class="bar">
+    <button class="circle" data-go="map">←</button>
+    <div><p class="overline" id="missionNumber">Mission</p><h2 id="missionTitle">Titre</h2></div>
+    <div class="counter">⭐ <span data-stars>0</span></div>
+  </header>
+  <article class="game-card">
+    <div class="guide">
+      <span class="owl-small">🦉</span>
+      <div><p id="storyText"></p><button class="secondary compact" id="hearInstruction">🔊 Écouter</button></div>
+    </div>
+    <p class="instruction" id="instruction"></p>
+    <div class="choices" id="choices"></div>
+    <p class="feedback" id="feedback"></p>
+    <button class="primary" id="checkBtn">Vérifier ma réponse</button>
+  </article>
+</section>
 
-    <section id="numbers" class="screen" aria-labelledby="numbers-title">
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">La montagne des nombres</p>
-          <h2 id="numbers-title">Construis le nombre demandé</h2>
-        </div>
-        <button class="icon-button" data-open="home" aria-label="Retour à l'accueil">🏠</button>
-      </div>
+<section class="screen page celebration" id="celebration">
+  <div class="confetti">✨ ⭐ ✨ ⭐ ✨</div>
+  <div class="big-dragon">🐉</div>
+  <h2>Bravo Alice !</h2>
+  <p id="celebrationText">Mission réussie !</p>
+  <div class="three-stars">⭐ ⭐ ⭐</div>
+  <button class="primary huge" data-go="map">Continuer l’aventure</button>
+</section>
 
-      <div class="game-card">
-        <div class="target-box">
-          Alice demande : <strong id="targetNumber">34</strong>
-          <button id="listenNumberBtn" class="mini-button">🔊</button>
-        </div>
-
-        <div class="number-layout">
-          <div>
-            <h3>Dizaines</h3>
-            <div id="tens" class="number-grid"></div>
-            <h3>Unités</h3>
-            <div id="units" class="number-grid units"></div>
-          </div>
-
-          <div class="assembled-area">
-            <p>Ton nombre</p>
-            <div id="assembled" class="assembled-number">—</div>
-            <button id="clearNumberBtn" class="secondary">Effacer</button>
-            <p id="numberMessage" class="feedback" aria-live="polite"></p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <footer>Fonctionne hors connexion après installation · Sans publicité · Données enregistrées sur l'appareil</footer>
-  </main>
-
-  <script src="script.js"></script>
+</main>
+<script src="script.js"></script>
 </body>
 </html>
