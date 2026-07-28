@@ -1,0 +1,10 @@
+{
+  "name": "Apprends à lire avec Alice",
+  "short_name": "Alice",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fff8ec",
+  "theme_color": "#8fd3c7",
+  "lang": "fr",
+  "icons": [{"src":"assets/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}

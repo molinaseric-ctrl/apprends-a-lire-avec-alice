@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#8fd3c7" />
+  <meta name="description" content="Application éducative pour apprendre à lire et découvrir les nombres avec Alice." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Apprends à lire avec Alice</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Jeu éducatif sans publicité</p>
+        <h1>Apprends à lire avec Alice</h1>
+      </div>
+      <div class="star-counter" aria-label="Nombre d'étoiles">⭐ <span id="stars">0</span></div>
+    </header>
+
+    <section id="home" class="screen active" aria-labelledby="home-title">
+      <div class="hero-card">
+        <div>
+          <span class="badge">Pour les enfants de 5 à 7 ans</span>
+          <h2 id="home-title">Bonjour, je suis Alice 👧</h2>
+          <p class="lead">Aujourd'hui, on joue avec les syllabes et les nombres.</p>
+          <div class="actions-grid">
+            <button class="primary yellow" data-open="reading">🔤 Les syllabes</button>
+            <button class="primary green" data-open="numbers">🔢 Les nombres</button>
+            <button class="primary purple" id="helloBtn">🔊 Écouter Alice</button>
+            <button class="primary blue" id="resetBtn">🔄 Recommencer</button>
+          </div>
+        </div>
+        <div class="alice-visual" aria-hidden="true">👧📖✨</div>
+      </div>
+
+      <div class="progress-card">
+        <div>
+          <strong>Mon aventure</strong>
+          <p>Chaque bonne réponse fait pousser le jardin d'Alice.</p>
+        </div>
+        <div id="garden" class="garden" aria-label="Jardin des récompenses">🌱</div>
+      </div>
+    </section>
+
+    <section id="reading" class="screen" aria-labelledby="reading-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">La forêt des syllabes</p>
+          <h2 id="reading-title">Écoute et choisis</h2>
+        </div>
+        <button class="icon-button" data-open="home" aria-label="Retour à l'accueil">🏠</button>
+      </div>
+
+      <div class="game-card">
+        <div class="prompt-card">
+          <p>Quelle syllabe entends-tu ?</p>
+          <div id="readingPrompt" class="big-symbol">🔊</div>
+          <button id="listenSyllableBtn" class="secondary">Écouter encore</button>
+        </div>
+        <div id="readingChoices" class="choice-grid"></div>
+        <p id="readingMessage" class="feedback" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section id="numbers" class="screen" aria-labelledby="numbers-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">La montagne des nombres</p>
+          <h2 id="numbers-title">Construis le nombre demandé</h2>
+        </div>
+        <button class="icon-button" data-open="home" aria-label="Retour à l'accueil">🏠</button>
+      </div>
+
+      <div class="game-card">
+        <div class="target-box">
+          Alice demande : <strong id="targetNumber">34</strong>
+          <button id="listenNumberBtn" class="mini-button">🔊</button>
+        </div>
+
+        <div class="number-layout">
+          <div>
+            <h3>Dizaines</h3>
+            <div id="tens" class="number-grid"></div>
+            <h3>Unités</h3>
+            <div id="units" class="number-grid units"></div>
+          </div>
+
+          <div class="assembled-area">
+            <p>Ton nombre</p>
+            <div id="assembled" class="assembled-number">—</div>
+            <button id="clearNumberBtn" class="secondary">Effacer</button>
+            <p id="numberMessage" class="feedback" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>Fonctionne hors connexion après installation · Sans publicité · Données enregistrées sur l'appareil</footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
